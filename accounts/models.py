@@ -27,7 +27,7 @@ class Product(models.Model):
     name = models.CharField(max_length=150, null=True)
     price = models.FloatField(max_length=150, null=True)
     category = models.CharField(max_length=150, null=True, choices=CATEGORY)
-    description = models.TextField(max_length=150, null=True)
+    description = models.TextField(max_length=150, null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     tags = models.ManyToManyField(Tag)
 
@@ -42,10 +42,10 @@ class Order(models.Model):
         ('Dostarczone', 'Dostarczone'),
 
     )
-    customer = models.ForeignKey(Customer,null=True, on_delete=models.SET_NULL)
-    product = models.ForeignKey(Product,null=True, on_delete=models.SET_NULL)
+    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    status = models.CharField(max_length=150, null=True,choices=STATUS)
+    status = models.CharField(max_length=150, null=True, choices=STATUS)
 
     def __str__(self):
-        return self.name
+        return self.product.name
