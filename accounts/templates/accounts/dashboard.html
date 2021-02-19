@@ -8,7 +8,7 @@
 
     <div class="row">
         <div class="col-md-5">
-            <h5><KLIENCI></KLIENCI>:</h5>
+            <h5><KLIENCI></KLIENCI>KLIENCI:</h5>
             <hr>
             <div class="card card-body">
                 <a class="btn btn-primary  btn-sm btn-block" href="">Nowy Klient</a>
@@ -16,13 +16,13 @@
                     <tr>
                         <th></th>
                         <th>Klient</th>
-                        <th>Zamówienia</th>
+                        <th>Telefon</th>
                     </tr>
                     {% for customer in customers %}
                     <tr>
                         <td><a class="btn btn-sm btn-info" href="{% url 'customer' customer.id %}">Podgląd</a> </td>
                         <td>{{ customer.name }}</td>
-                        <td>{{ customer. }}</td>
+                        <td>{{ customer.phone }}</td>
                     {% endfor %}
                     </tr>
                 </table>
@@ -33,7 +33,7 @@
             <h5>OSTATNIE 5 ZAMÓWIEŃ</h5>
             <hr>
             <div class="card card-body">
-                <a class="btn btn-primary  btn-sm btn-block" href="{% url 'create_order' %}">Nowe zamówienie</a>
+
                 <table class="table table-sm">
                     <tr>
                         <th>Produkt</th>
