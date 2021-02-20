@@ -1,12 +1,59 @@
 from django.shortcuts import render, redirect
 from .models import *
-from .forms import OrderForm
+from .forms import OrderForm, CreateUserForm
 from django.forms import inlineformset_factory
 from .filters import OrderFilter
-
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        form = CreateUserForm()
+
+        if request.method == 'POST':
+            form = CreateUserForm(request.POST)
+            if form.is_valid():
+                form.save()
+                """This allows us to get a username without any other attributes"""
+                user = form.cleaned_data.get('username')
+                messages.success(request, 'Konto zostało utworzone dla użytkownika ' + user)
+                return redirect('login')
+        context = {'form': form}
+        return render(request, 'accounts/register.html', context)
+
+
+def login_user(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            else:
+                messages.info(request, 'Nazwa użytkownika lub hasło jest nieprawidłowe.')
+
+        context = {}
+        return render(request, 'accounts/login.html', context)
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
+
+
+@login_required(login_url='login')
 def home(request):
     orders = Order.objects.all()
     customers = Customer.objects.all()
@@ -21,6 +68,7 @@ def home(request):
     return render(request, 'accounts/dashboard.html', context)
 
 
+@login_required(login_url='login')
 def customer(request, pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
@@ -34,6 +82,7 @@ def customer(request, pk):
     return render(request, 'accounts/customer.html', context)
 
 
+@login_required(login_url='login')
 def products(request):
     products = Product.objects.all()
 
@@ -41,6 +90,7 @@ def products(request):
     return render(request, 'accounts/products.html', context)
 
 
+@login_required(login_url='login')
 def createOrder(request, pk):
     OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=10)
     customer = Customer.objects.get(id=pk)
@@ -57,6 +107,7 @@ def createOrder(request, pk):
     return render(request, 'accounts/order_form.html', context)
 
 
+@login_required(login_url='login')
 def updateOrder(request, pk):
 
     order = Order.objects.get(id=pk)
@@ -71,6 +122,7 @@ def updateOrder(request, pk):
     return render(request, 'accounts/order_form.html', context)
 
 
+@login_required(login_url='login')
 def deleteOrder(request, pk):
     item = Order.objects.get(id=pk)
     order = Order.objects.get(id=pk)
