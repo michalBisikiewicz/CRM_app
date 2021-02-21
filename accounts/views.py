@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .decorators import unauthenticated_user, allowed_users, admin_only
+from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.models import Group
 # Create your views here.
 
@@ -56,7 +56,7 @@ def logout_user(request):
 
 
 @login_required(login_url='login')
-@admin_only
+@allowed_users(allowed_roles=['admin'])
 def home(request):
     orders = Order.objects.all()
     customers = Customer.objects.all()
@@ -71,7 +71,7 @@ def home(request):
     return render(request, 'accounts/dashboard.html', context)
 
 
-def user(request):
+def user_page(request):
     context = {}
     return render(request, 'accounts/user.html', context)
 
