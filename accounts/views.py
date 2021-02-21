@@ -15,7 +15,6 @@ from django.contrib.auth.models import Group
 @unauthenticated_user
 def register(request):
     form = CreateUserForm()
-
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
         if form.is_valid():
@@ -25,6 +24,10 @@ def register(request):
 
             group = Group.objects.get(name='customer')
             user.groups.add(group)
+            Customer.objects.create(
+                user=user,
+                name=user.username,
+            )
 
             messages.success(request, 'Konto zostało utworzone dla użytkownika ' + username)
             return redirect('login')
@@ -71,8 +74,17 @@ def home(request):
     return render(request, 'accounts/dashboard.html', context)
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
 def user_page(request):
-    context = {}
+    orders = request.user.customer.order_set.all()
+
+    total_orders = orders.count()
+    delivered = orders.filter(status='Dostarczone').count()
+    pending = orders.filter(status='Oczekuje').count()
+
+    context = {'orders': orders, 'total_orders': total_orders,
+               'delivered': delivered, 'pending': pending}
     return render(request, 'accounts/user.html', context)
 
 
